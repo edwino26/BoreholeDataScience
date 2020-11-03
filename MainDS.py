@@ -1,6 +1,12 @@
 import glob
 import lasio
 import matplotlib.pyplot as plt
+import pandas as pd
+
+
+#Clustering packages
+from sklearn.cluster import MiniBatchKMeans
+from sklearn.feature_extraction.image import extract_patches_2d
 
 
 files = glob.glob('./*.las')
@@ -14,16 +20,19 @@ No_logs = len(headers)
 dims = las.data.shape
 
 print(dims)
+i=0
 for curve in las.curves:
-    print(curve.mnemonic + ": " + str(curve.data))
+    print(curve.mnemonic + ": " + str(curve.data) + " " + str(i))
+    i += 1
 
-print((las.curves['DEPT']))
+data = pd.DataFrame(las.data)
 
 DEPTH = las.index
-GR = las["GR_EDTC"]
-RESD = las["AT90"]
-RHOB = las["RHOZ"]
-NPHI= las["NPHI"]
+GR = data[53] #las["GR_EDTC"]
+RESD = data[225] #las["AT90"]
+RHOB = data[108] #las["RHOZ"]
+NPHI= data[96] #las["NPHI"]
+
 
 BD = 3000
 TD = 3880
@@ -41,4 +50,21 @@ plt.plot(NPHI, DEPTH, 'blue')
 plt.gca().invert_yaxis(); plt.axis([0.6, 0, BD, TD]); plt.gca().invert_yaxis();plt.gca().yaxis.set_visible(False)
 
 plt.suptitle('Well logs for ' + las.well['WELL']['value'])
-plt.show()
+
+# Plot Input Logs
+#plt.show()
+
+#Explore
+#data_o = data.dropna()
+print(data.head())
+data_o = data.iloc[:, [0, 53, 225, 108, 96]]
+data_o = data_o.dropna()
+data_o = data_o.rename(columns={0: 'DEPTH', 53: "GR", 225: 'RESD', 108: "RHOB", 96: "NPHI"})
+print("Size is:")
+print(data_o.size)
+print("Header")
+print(data_o.head())
+
+
+#CLustering
+#https://scikit-learn.org/stable/auto_examples/cluster/plot_kmeans_digits.html
