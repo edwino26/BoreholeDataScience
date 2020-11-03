@@ -68,3 +68,5 @@ print(data_o.head())
 
 #CLustering
 #https://scikit-learn.org/stable/auto_examples/cluster/plot_kmeans_digits.html
+#https://towardsdatascience.com/k-means-clustering-with-scikit-learn-6b47a369a83c
+
