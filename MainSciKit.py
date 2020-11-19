@@ -11,6 +11,7 @@ from sklearn.feature_extraction.image import extract_patches_2d
 from sklearn.model_selection import train_test_split
 from sklearn.neural_network import MLPRegressor
 from sklearn.datasets import make_regression
+from sklearn.preprocessing import StandardScaler
 
 
 
@@ -79,8 +80,18 @@ print(data_o.head())
 
 print(data_o.shape)
 
+
+#Scale and Prepare Data
+scaler = StandardScaler()
+
+
 X = np.array([train['GR'], train['RESD'], train['RHOB']]).T
 X_test = np.array([test['GR'], test['RESD'], test['RHOB']]).T
+
+scaler.fit(X)   #Fit scaler on training data
+X_test = scaler.transform(X_test)
+X = scaler.transform(X)
+
 y = np.array(train['NPHI'])
 y_test = np.array(test['NPHI'])
 
@@ -89,19 +100,23 @@ y_test = np.array(test['NPHI'])
 #https://towardsdatascience.com/k-means-clustering-with-scikit-learn-6b47a369a83c
 
 
-model = MLPRegressor(random_state=1, max_iter =500, hidden_layer_sizes=(100, 80, 50), validation_fraction=0)._fit(X,y)
+model = MLPRegressor(random_state=1, max_iter =500, hidden_layer_sizes=(100, 80, 50, 40, 30), validation_fraction=0)._fit(X,y)
 model.predict(X_test)
 print(model.score(X_test, y_test))
 
 print(model.get_params(True))
 
-plt.figure()
+fig = plt.figure()
 plt.subplot(121)
 plt.plot(y, model.predict(X), 'o')
 plt.plot(y, y,  'blue')
-plt.subplot(122)
+ax = fig.add_subplot(122)
 plt.plot(y_test, model.predict(X_test), 'o')
 plt.plot(y_test, y_test,  'blue')
-plt.suptitle('Training vs Test Data for NPHI prediction' + las.well['WELL']['value'])
+plt.suptitle('Training vs Test Data for NPHI prediction ' + las.well['WELL']['value'] + 'Well')
+ax.text(0.95, 0.01, str(round(model.score(X_test, y_test),2)),
+        verticalalignment='bottom', horizontalalignment='right',
+        transform=ax.transAxes,
+        color='green', fontsize=15)
 plt.show()
 
