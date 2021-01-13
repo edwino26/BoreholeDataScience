@@ -120,3 +120,4 @@ ax.text(0.95, 0.01, str(round(model.score(X_test, y_test),2)),
         color='green', fontsize=15)
 plt.show()
 
+
